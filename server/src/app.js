@@ -182,9 +182,6 @@ app.delete("/api/deleteEvent/:id", async (req, res) => {
 async function main() {
   await prisma.$connect();
   console.log("Connected to Database successfully!");
-  app.listen(process.env.PORT, () => {
-    console.log(`Server started on port ${process.env.PORT}`);
-  });
 }
 
 main()
@@ -192,3 +189,6 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+
+module.exports = app;
