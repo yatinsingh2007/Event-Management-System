@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Calendar, Clock, Edit2, FileText } from 'lucide-react';
+import { Users, Calendar, Clock, Edit2, FileText, Trash } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const EventList = () => {
+    const navigate = useNavigate();
     const [selectedUser, setSelectedUser] = useState(() => {
         try {
-            return JSON.parse(sessionStorage.getItem("selectedUser"));
+            return JSON.parse(sessionStorage.getItem("selectedUser")) || [];
         } catch {
             return []
         }
     });
     const [events, setEvents] = useState([]);
     const [loader, setLoader] = useState(false)
+    const [activeLogId, setActiveLogId] = useState(null);
 
     useEffect(() => {
         sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
@@ -98,16 +102,42 @@ const EventList = () => {
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm">
+                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm cursor-pointer" onClick={() => navigate(`/edit/${event.id}`)}>
                                         <Edit2 className="w-3 h-3" />
                                         Edit
                                     </button>
-                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm">
+                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-red-600 hover:bg-red-50 transition-colors shadow-sm cursor-pointer" onClick={async () => {
+                                        try {
+                                            const response = await fetch(`http://localhost:5001/api/deleteEvent/${event.id}`, {
+                                                method: 'DELETE',
+                                            });
+                                            if (response.ok) {
+                                                setEvents(events.filter(e => e.id !== event.id));
+                                            } else {
+                                                console.error("Failed to delete");
+                                            }
+                                        } catch (error) {
+                                            console.error("Error deleting event", error);
+                                        }
+                                    }}>
+                                        <Trash className="w-3 h-3" />
+                                        Delete
+                                    </button>
+                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm cursor-pointer" onClick={() => setActiveLogId(activeLogId === event.id ? null : event.id)}>
                                         <FileText className="w-3 h-3" />
                                         Logs
                                     </button>
                                 </div>
                             </div>
+                            {activeLogId === event.id && (
+                                <div className="bg-gray-50 p-3 text-xs border-t border-gray-200 animate-in slide-in-from-top-1 duration-200">
+                                    <p className="font-medium text-gray-500 mb-1">Recent Updates</p>
+                                    <div className="flex justify-between items-center text-gray-700">
+                                        <span>Last modified</span>
+                                        <span className="font-mono">{new Date(event.updatedAt || Date.now()).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))
                 ) : (

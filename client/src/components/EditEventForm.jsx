@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import OtherProfileSelector from './OtherProfileSelector';
+import { useNavigate } from 'react-router-dom';
+import EditProfileSelector from './EditProfileSelector';
 
-const CreateEventForm = () => {
-    const [selectedUser, setSelectedUser] = useState(() => {
+const EditEventForm = ({ eventId }) => {
+    const navigate = useNavigate();
+    const [editSelectedUser, setEditSelectedUser] = useState(() => {
         try {
-            return JSON.parse(sessionStorage.getItem("selectedUser")) || [];
+            return JSON.parse(sessionStorage.getItem("editSelectedUser")) || [];
         } catch {
             return []
         }
@@ -17,12 +19,42 @@ const CreateEventForm = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
-    }, [selectedUser])
+        if (eventId) {
+            const fetchEvent = async () => {
+                try {
+                    const response = await fetch(`http://localhost:5001/api/getEvent/${eventId}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        const start = new Date(data.start);
+                        const end = new Date(data.end);
+
+                        setStartDate(start.toISOString().split('T')[0]);
+                        setStartTime(start.toTimeString().slice(0, 5));
+                        setEndDate(end.toISOString().split('T')[0]);
+                        setEndTime(end.toTimeString().slice(0, 5));
+                        const userNames = data.users.map(u => u.name);
+                        setEditSelectedUser(userNames);
+                    } else {
+                        toast.error("Failed to fetch event details");
+                    }
+                } catch (err) {
+                    console.log(err);
+                    toast.error("Error fetching event");
+                }
+            };
+            fetchEvent();
+        }
+    }, [eventId]);
+
+    useEffect(() => {
+        sessionStorage.setItem("editSelectedUser", JSON.stringify(editSelectedUser));
+    }, [editSelectedUser])
 
     const handleFormSubmission = async (e) => {
         e.preventDefault();
-        if (!selectedUser || selectedUser.length === 0) {
+        const currentSelectedUsers = JSON.parse(sessionStorage.getItem("editSelectedUser")) || [];
+
+        if (currentSelectedUsers.length === 0) {
             toast.error("Please select at least one profile");
             return;
         }
@@ -33,22 +65,23 @@ const CreateEventForm = () => {
 
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5001/api/createEvent', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:5001/api/updateEvent/${eventId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    "users": selectedUser,
+                    "users": currentSelectedUsers,
                     "startAt": startDate + "T" + startTime,
                     "endAt": endDate + "T" + endTime
                 })
             })
             const data = await response.json();
             if (response.ok) {
-                toast.success('Event created successfully!');
+                toast.success('Event updated successfully!');
+                navigate('/');
             } else {
-                toast.error(data.error || 'Failed to create event');
+                toast.error(data.error || 'Failed to update event');
             }
         } catch (err) {
             console.log(err)
@@ -59,11 +92,11 @@ const CreateEventForm = () => {
     }
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold mb-6">Create Event</h2>
+            <h2 className="text-xl font-semibold mb-6">Edit Event</h2>
 
             <form className="space-y-5" onSubmit={handleFormSubmission}>
                 <div className="space-y-4">
-                    <OtherProfileSelector />
+                    <EditProfileSelector key={JSON.stringify(editSelectedUser)} />
                 </div>
 
                 <div className="space-y-1">
@@ -109,7 +142,7 @@ const CreateEventForm = () => {
 
                 <div className="pt-2">
                     <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer transition-colors disabled:opacity-50">
-                        {loading ? '+ Create Event' : '+ Create Event'}
+                        {loading ? 'Processing...' : 'Update Event'}
                     </button>
                 </div>
             </form>
@@ -117,4 +150,4 @@ const CreateEventForm = () => {
     );
 };
 
-export default CreateEventForm;
+export default EditEventForm;
