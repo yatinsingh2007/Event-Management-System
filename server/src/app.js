@@ -179,6 +179,12 @@ app.delete("/api/deleteEvent/:id", async (req, res) => {
   }
 });
 
+app.get('/' , (req , res) => {
+  return res.status(200).json({
+    message : "Welcome to Event Management System"
+  })
+})
+
 async function main() {
   await prisma.$connect();
   console.log("Connected to Database successfully!");
