@@ -1,10 +1,14 @@
 require('dotenv').config();
 const { prisma } = require("./dbConfig/dbConfig")
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
 
-
+app.use(cors({
+    origin : "http://localhost:5173"
+}));
+app.use(express.json());
 app.get("/api/getAllUsers" , async (req , res) => {
     try{
         const users = await prisma.user.findMany();
