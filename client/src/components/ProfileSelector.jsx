@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 
 const ProfileSelector = () => {
     const [userData, setUserData] = useState([]);
+    const [filteredData , setFilteredData] = useState([]);
     const [showDropDown, setShowDropDown] = useState(false);
     const [loader, setLoader] = useState(false);
+    const [isAddClick , setIsAddClick] = useState(false);
+    const [newName , setNewName] = useState("");
 
     const handleProfileClick = async (e) => {
         e.preventDefault();
         try {
-            setShowDropDown(!showDropDown); // Toggle instead of just setting true
-            if (!showDropDown && userData.length === 0) { // Only fetch if opening and no data
+            setShowDropDown(!showDropDown);
+            if (!showDropDown && userData.length === 0) {
                 setLoader(true);
                 const response = await fetch('http://localhost:5001/api/getAllUsers', {
                     method: 'GET',
@@ -19,6 +22,7 @@ const ProfileSelector = () => {
                 });
                 const data = await response.json();
                 setUserData(data);
+                setFilteredData(data)
             }
         } catch (err) {
             console.log(err);
@@ -30,12 +34,14 @@ const ProfileSelector = () => {
     const handleSearch = (e) => {
         e.preventDefault();
         const searchValue = e.target.value;
-        if (!searchValue) {
+        if (searchValue.trim()===""){
+            setFilteredData(userData);
+            return;
         }
         const filteredData = userData.filter((user) => {
             return user.name.toLowerCase().includes(searchValue.toLowerCase());
         });
-        setUserData(filteredData);
+        setFilteredData(filteredData);
     };
 
     return (
@@ -47,7 +53,7 @@ const ProfileSelector = () => {
                 Select profile's
             </div>
             {showDropDown && (
-                <div className='absolute z-10 bg-white rounded-md shadow-lg right-0 mt-1 w-72 border border-gray-100'>
+                <div className='absolute z-10 bg-white rounded-md shadow-lg right-0 mt-1 w-56 md:w-72 border border-gray-100 md:right-72'>
                     <div className="p-2">
                         <input
                             type='text'
@@ -61,8 +67,8 @@ const ProfileSelector = () => {
                             <div className='flex justify-center p-4'>
                                 <div className='rounded-full w-5 h-5 border-2 border-t-black animate-spin border-gray-100'></div>
                             </div>
-                        ) : userData.length > 0 ? (
-                            userData.map((user, i) => (
+                        ) : filteredData.length > 0 ? (
+                            filteredData.map((user, i) => (
                                 <div key={i} className="flex items-center gap-2 p-1 hover:bg-gray-50 rounded">
                                     <input type="checkbox" name={user.name} id={`user-${i}`} className="rounded text-indigo-600" />
                                     <label htmlFor={`user-${i}`} className="text-sm text-gray-700 cursor-pointer flex-1">{user.name}</label>
@@ -73,7 +79,28 @@ const ProfileSelector = () => {
                         )}
                     </div>
                     <div className="p-2 border-t border-gray-100">
-                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md w-full text-sm font-medium transition-colors">
+                        {isAddClick && <input type='text' placeholder='Enter profile name' className='w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-sm mb-2' onChange={(e) => setNewName(e.target.value)}/>}
+                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md w-full text-sm font-medium transition-colors" onClick={async (e) => {
+                            e.preventDefault();
+                            if (isAddClick && newName.length == 0){
+                                setIsAddClick(false);
+                                return;
+                            };
+                            setIsAddClick(true);
+                            try{
+                               const response = await fetch('http://localhost:5001/api/createUser', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ "name" : newName }),
+                            });
+                            const data = await response.json();
+                            setUserData([...userData , data])
+                            }catch(err){
+                                console.log(err);
+                            }
+                        }}>
                             Add Profile
                         </button>
                     </div>
