@@ -21,7 +21,7 @@ const EventList = () => {
         const getEvents = async () => {
             try {
                 setLoader(true)
-                const response = await fetch('http://localhost:5001/api/getEvent', {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const EventList = () => {
                                     </button>
                                     <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-red-600 hover:bg-red-50 transition-colors shadow-sm cursor-pointer" onClick={async () => {
                                         try {
-                                            const response = await fetch(`http://localhost:5001/api/deleteEvent/${event.id}`, {
+                                            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/deleteEvent/${event.id}`, {
                                                 method: 'DELETE',
                                             });
                                             if (response.ok) {

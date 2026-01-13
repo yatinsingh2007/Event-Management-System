@@ -33,7 +33,7 @@ const CreateEventForm = () => {
 
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5001/api/createEvent', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/createEvent`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

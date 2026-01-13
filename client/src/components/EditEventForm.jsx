@@ -22,7 +22,7 @@ const EditEventForm = ({ eventId }) => {
         if (eventId) {
             const fetchEvent = async () => {
                 try {
-                    const response = await fetch(`http://localhost:5001/api/getEvent/${eventId}`);
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent/${eventId}`);
                     const data = await response.json();
                     if (response.ok) {
                         const start = new Date(data.start);
@@ -65,7 +65,7 @@ const EditEventForm = ({ eventId }) => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/updateEvent/${eventId}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/updateEvent/${eventId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

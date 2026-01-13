@@ -22,7 +22,7 @@ const OtherProfileSelector = () => {
             setShowDropDown(!showDropDown);
             if (!showDropDown && userData.length === 0) {
                 setLoader(true);
-                const response = await fetch('http://localhost:5001/api/getAllUsers', {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getAllUsers`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const OtherProfileSelector = () => {
                             setIsAddClick(true);
                             try {
                                 setAddLoader(true)
-                                const response = await fetch('http://localhost:5001/api/createUser', {
+                                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/createUser`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
