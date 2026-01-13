@@ -41,6 +41,28 @@ app.post("/api/createUser" , async (req , res) => {
     }
 });
 
+
+app.post("/api/createEvent" , async (req , res) => {
+    try{
+        const { users , startAt , endAt } = req.body;
+        if (users.length === 0) return res.status(400).json({
+            "error" : "At least one user is required"
+        });
+
+        const event = await prisma.event.create({
+            data : {
+               
+            }
+        })
+        return res.status(201).json(event);
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
+    }
+})
+
 async function main(){
     await prisma.$connect();
     console.log("Connected to Database successfully!");

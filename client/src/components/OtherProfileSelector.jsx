@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 
-const ProfileSelector = () => {
+const OtherProfileSelector = () => {
     const [userData, setUserData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [showDropDown, setShowDropDown] = useState(false);
@@ -9,10 +9,11 @@ const ProfileSelector = () => {
     const [isAddClick, setIsAddClick] = useState(false);
     const [newName, setNewName] = useState("");
     const [addLoader, setAddLoader] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(JSON.parse(sessionStorage.getItem("selectedUser")) || []);
+    const [selectedUser, setSelectedUser] = useState(JSON.parse(sessionStorage.getItem("otherSelectedUser")) || []);
 
     useEffect(() => {
-        sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
+        sessionStorage.setItem("otherSelectedUser", JSON.stringify(selectedUser));
+        console.log(selectedUser)
     }, [selectedUser])
 
     const handleProfileClick = async (e) => {
@@ -77,14 +78,14 @@ const ProfileSelector = () => {
                         ) : filteredData.length > 0 ? (
                             filteredData.map((user, i) => (
                                 <div key={i} className="flex items-center gap-2 p-1 hover:bg-gray-50 rounded">
-                                    <input type="checkbox" name={user.name} id={`hi-${i}`} className="rounded text-indigo-600" onClick={() => {
+                                    <input type="checkbox" name={user.name} id={`other-hi-${i}`} className="rounded text-indigo-600" onClick={() => {
                                         if (!selectedUser.includes(user.name)) {
                                             setSelectedUser([...selectedUser, user.name]);
                                         } else {
                                             setSelectedUser(selectedUser.filter((name) => name !== user.name));
                                         }
                                     }} defaultChecked={selectedUser.includes(user.name)} />
-                                    <label htmlFor={`hi-${i}`} className="text-sm text-gray-700 cursor-pointer flex-1">{user.name}</label>
+                                    <label htmlFor={`other-hi-${i}`} className="text-sm text-gray-700 cursor-pointer flex-1">{user.name}</label>
                                 </div>
                             ))
                         ) : (
@@ -127,4 +128,4 @@ const ProfileSelector = () => {
     );
 };
 
-export default ProfileSelector;
+export default OtherProfileSelector;

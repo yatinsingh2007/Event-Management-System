@@ -23,7 +23,6 @@ model User {
 
 model Event {
   id        String   @id @default(cuid())
-  name      String
   users     User[]
   start     DateTime
   end       DateTime
