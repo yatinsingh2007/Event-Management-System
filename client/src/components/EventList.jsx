@@ -113,8 +113,10 @@ const EventList = () => {
                                             });
                                             if (response.ok) {
                                                 setEvents(events.filter(e => e.id !== event.id));
+                                                toast.success("Event deleted successfully");
                                             } else {
                                                 console.error("Failed to delete");
+                                                toast.error("Failed to delete event");
                                             }
                                         } catch (error) {
                                             console.error("Error deleting event", error);

@@ -163,6 +163,21 @@ app.put("/api/updateEvent/:id", async (req, res) => {
   }
 });
 
+app.delete("/api/deleteEvent/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await prisma.event.delete({
+      where: { 
+        id 
+      },
+    });
+    return res.status(200).json(event);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 async function main() {
   await prisma.$connect();
   console.log("Connected to Database successfully!");
