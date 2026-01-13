@@ -5,8 +5,37 @@ const express = require('express');
 const app = express();
 
 
+app.get("/api/getAllUsers" , async (req , res) => {
+    try{
+        const users = await prisma.user.findMany();
+        return res.status(200).json(users);
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
+    }
+});
 
-
+app.post("/api/createUser" , async (req , res) => {
+    try{
+        const { name } = req.body;
+        if (!name) return res.status(400).json({
+            "error" : "Name is required"
+        })
+        const user = await prisma.user.create({
+            data : {
+                name
+            }
+        })
+        return res.status(201).json(user);
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
+    }
+});
 
 async function main(){
     await prisma.$connect();
