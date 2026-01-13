@@ -49,12 +49,56 @@ app.post("/api/createEvent" , async (req , res) => {
             "error" : "At least one user is required"
         });
 
+        const usersData = await prisma.user.findMany({
+            where : {
+                name : {
+                    in : users
+                }
+            } ,
+            select : {
+                id : true
+            }
+        })
+
         const event = await prisma.event.create({
             data : {
-               
+                users : {
+                    connect : usersData
+                } ,
+                start : new Date(startAt + ":00") ,
+                end : new Date(endAt + ":00")
+            } ,
+            include : {
+                users : true
             }
         })
         return res.status(201).json(event);
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
+    }
+});
+
+app.post('/api/getEvent' , async (req , res) => {
+    try{
+        const { users } = req.body;
+        const events = await prisma.event.findMany({
+            where : {
+                users : {
+                    every : {
+                        name : {
+                            in : users
+                        }
+                    }
+                }
+            } ,
+            include : {
+                users : true
+            }
+        })
+        return res.status(200).json(events);
     }catch(err){
         console.log(err);
         return res.status(500).json({

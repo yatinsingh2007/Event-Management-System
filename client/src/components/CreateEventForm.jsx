@@ -1,15 +1,35 @@
 import React from 'react';
+import toast from 'react-hot-toast';
 import OtherProfileSelector from './OtherProfileSelector';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const CreateEventForm = () => {
-    const selectedUser = JSON.parse(sessionStorage.getItem("selectedUser") || []);
+    const [selectedUser, setSelectedUser] = useState(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("selectedUser"));
+        } catch {
+            return []
+        }
+    })
+    const [startDate, setStartDate] = useState("");
+    const [startTime, setStartTime] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [endTime, setEndTime] = useState("");
 
     useEffect(() => {
         sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
     }, [selectedUser])
     const handleFormSubmission = async (e) => {
         e.preventDefault();
+        if (!selectedUser || selectedUser.length === 0) {
+            toast.error("Please select at least one profile");
+            return;
+        }
+        if (!startDate || !startTime || !endDate || !endTime) {
+            toast.error("Please fill in all date and time fields");
+            return;
+        }
+
         try {
             const response = await fetch('http://localhost:5001/api/createEvent', {
                 method: 'POST',
@@ -17,13 +37,21 @@ const CreateEventForm = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    "users" : selectedUser
+                    "users": selectedUser,
+                    "startAt": startDate + "T" + startTime,
+                    "endAt": endDate + "T" + endTime
                 })
             })
             const data = await response.json();
-            console.log(data)
+            if (response.ok) {
+                toast.success('Event created successfully!');
+                // Optionally reset form here
+            } else {
+                toast.error(data.error || 'Failed to create event');
+            }
         } catch (err) {
             console.log(err)
+            toast.error('An error occurred');
         }
     }
     return (
@@ -48,10 +76,14 @@ const CreateEventForm = () => {
                     <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} />
+                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                                setStartDate(e.target.value);
+                            }} />
                         </div>
                         <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" defaultValue="09:00" />
+                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" defaultValue="09:00" onChange={(e) => {
+                                setStartTime(e.target.value);
+                            }} />
                         </div>
                     </div>
                 </div>
@@ -60,10 +92,14 @@ const CreateEventForm = () => {
                     <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} />
+                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                                setEndDate(e.target.value);
+                            }} />
                         </div>
                         <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" defaultValue="09:00" />
+                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" defaultValue="09:00" onChange={(e) => {
+                                setEndTime(e.target.value);
+                            }} />
                         </div>
                     </div>
                 </div>

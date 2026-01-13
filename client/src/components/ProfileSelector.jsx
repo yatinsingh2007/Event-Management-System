@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 
 const ProfileSelector = () => {
@@ -9,7 +10,13 @@ const ProfileSelector = () => {
     const [isAddClick, setIsAddClick] = useState(false);
     const [newName, setNewName] = useState("");
     const [addLoader, setAddLoader] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(JSON.parse(sessionStorage.getItem("selectedUser")) || []);
+    const [selectedUser, setSelectedUser] = useState(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("selectedUser"));
+        } catch {
+            return []
+        }
+    });
 
     useEffect(() => {
         sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
@@ -110,10 +117,17 @@ const ProfileSelector = () => {
                                     body: JSON.stringify({ "name": newName }),
                                 });
                                 const data = await response.json();
-                                setUserData([...userData, data]);
-                                setFilteredData([...userData, data]);
+                                if (response.ok) {
+                                    setUserData([...userData, data]);
+                                    setFilteredData([...userData, data]);
+                                    toast.success('Profile added successfully');
+                                    setNewName("");
+                                } else {
+                                    toast.error(data.error || "Failed to add profile");
+                                }
                             } catch (err) {
                                 console.log(err);
+                                toast.error("An error occurred");
                             } finally {
                                 setAddLoader(false)
                             }

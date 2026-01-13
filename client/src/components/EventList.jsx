@@ -1,6 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Users, Calendar, Clock, Edit2, FileText } from 'lucide-react';
 
 const EventList = () => {
+    const [selectedUser, setSelectedUser] = useState(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem("selectedUser"));
+        } catch {
+            return []
+        }
+    });
+    const [events, setEvents] = useState([]);
+    const [loader, setLoader] = useState(false)
+
+    useEffect(() => {
+        sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
+        const getEvents = async () => {
+            try {
+                setLoader(true)
+                const response = await fetch('http://localhost:5001/api/getEvent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ "users": selectedUser }),
+                });
+                const data = await response.json();
+                console.log(data)
+                setEvents(data);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setLoader(false)
+            }
+        };
+        getEvents();
+    }, [selectedUser]);
+
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col h-full">
             <h2 className="text-xl font-semibold mb-4">Events</h2>
@@ -14,8 +49,72 @@ const EventList = () => {
                 </select>
             </div>
 
-            <div className="flex-grow flex flex-col items-center justify-center text-gray-400 min-h-[200px]">
-                <p>No events found</p>
+            <div className="grow overflow-y-auto space-y-3">
+                {events.length > 0 ? (
+                    events.map((event) => (
+                        <div key={event.id} className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+                            <div className="p-3 space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-indigo-500" />
+                                    <span className="text-sm font-medium text-gray-900 line-clamp-1">
+                                        {event.users.map(u => u.name).join(', ')}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <div className="flex items-start gap-2">
+                                        <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
+                                        <div>
+                                            <div className="text-xs font-medium text-gray-700">Start</div>
+                                            <div className="text-sm text-gray-900">
+                                                {new Date(event.start).toLocaleDateString()}
+                                            </div>
+                                            <div className="text-xs text-gray-500 flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
+                                                {new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-2">
+                                        <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
+                                        <div>
+                                            <div className="text-xs font-medium text-gray-700">End</div>
+                                            <div className="text-sm text-gray-900">
+                                                {new Date(event.end).toLocaleDateString()}
+                                            </div>
+                                            <div className="text-xs text-gray-500 flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
+                                                {new Date(event.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 border-t border-gray-100 p-2 flex items-center justify-between gap-2">
+                                <div className="space-y-0.5">
+                                    <div className="text-[10px] text-gray-400">
+                                        Created: {new Date(event.createdAt || Date.now()).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm">
+                                        <Edit2 className="w-3 h-3" />
+                                        Edit
+                                    </button>
+                                    <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors shadow-sm">
+                                        <FileText className="w-3 h-3" />
+                                        Logs
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400 min-h-[100px]">
+                        <p>No events found</p>
+                    </div>
+                )}
             </div>
         </div>
     );
