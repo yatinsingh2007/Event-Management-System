@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState , React } from "react";
+import { createContext, useEffect, useState  }  from "react";
+import React from "react";
 
 
 const EditProfileContext = createContext(null);
