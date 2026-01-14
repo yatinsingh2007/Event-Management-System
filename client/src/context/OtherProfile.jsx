@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState , React } from "react";
 
 
 const OtherProfileContext = createContext(null);
