@@ -115,7 +115,7 @@ const EventList = () => {
                             <div className="bg-gray-50 border-t border-gray-100 p-2 flex items-center justify-between gap-2">
                                 <div className="space-y-0.5">
                                     <div className="text-[10px] text-gray-400">
-                                        Created: {new Date(event.createdAt || Date.now()).toLocaleDateString()}
+                                        Created: {new Date(event.createdAt).toLocaleDateString()}
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
