@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import EditProfileSelector from './EditProfileSelector';
+import { EditProfileContext } from '../context/EditProfile';
 
 const EditEventForm = ({ eventId }) => {
     const navigate = useNavigate();
-    const [editSelectedUser, setEditSelectedUser] = useState(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem("editSelectedUser")) || [];
-        } catch {
-            return []
-        }
-    })
+    const { selectEditedUser, setSelectEditedUser } = useContext(EditProfileContext);
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("09:00");
     const [endDate, setEndDate] = useState("");
@@ -44,15 +39,11 @@ const EditEventForm = ({ eventId }) => {
             };
             fetchEvent();
         }
-    }, [eventId]);
-
-    useEffect(() => {
-        sessionStorage.setItem("editSelectedUser", JSON.stringify(editSelectedUser));
-    }, [editSelectedUser])
+    }, [eventId, setSelectEditedUser]);
 
     const handleFormSubmission = async (e) => {
         e.preventDefault();
-        const currentSelectedUsers = JSON.parse(sessionStorage.getItem("editSelectedUser")) || [];
+        const currentSelectedUsers = editSelectedUser || [];
 
         if (currentSelectedUsers.length === 0) {
             toast.error("Please select at least one profile");

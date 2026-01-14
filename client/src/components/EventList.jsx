@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Users, Calendar, Clock, Edit2, FileText, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { ProfileContext } from '../context/Profile';
 
 const EventList = () => {
     const navigate = useNavigate();
-    const [selectedUser, setSelectedUser] = useState(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem("selectedUser")) || [];
-        } catch {
-            return []
-        }
-    });
+    const { selectedUser } = useContext(ProfileContext);
     const [events, setEvents] = useState([]);
     const [loader, setLoader] = useState(false)
     const [activeLogId, setActiveLogId] = useState(null);
 
     useEffect(() => {
-        sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
+        if (!selectedUser || selectedUser.length === 0) return;
         const getEvents = async () => {
             try {
                 setLoader(true)
@@ -41,7 +36,8 @@ const EventList = () => {
     }, [selectedUser]);
 
     const handleSearch = async (e) => {
-        try{
+        try {
+            console.log(selectedUser)
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent`, {
                 method: 'POST',
                 headers: {
@@ -52,7 +48,7 @@ const EventList = () => {
             const data = await response.json();
             console.log(data)
             setEvents(data);
-        }catch(err){
+        } catch (err) {
             console.log(err);
             toast.error("Something went wrong")
         }

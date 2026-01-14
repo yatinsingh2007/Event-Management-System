@@ -1,24 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import toast from 'react-hot-toast';
 import OtherProfileSelector from './OtherProfileSelector';
+import { OtherProfileContext } from '../context/OtherProfile';
 
 const CreateEventForm = () => {
-    const [selectedUser, setSelectedUser] = useState(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem("selectedUser")) || [];
-        } catch {
-            return []
-        }
-    })
+    const { selectedUser } = useContext(OtherProfileContext);
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("09:00");
     const [endDate, setEndDate] = useState("");
     const [endTime, setEndTime] = useState("09:00");
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        sessionStorage.setItem("selectedUser", JSON.stringify(selectedUser));
-    }, [selectedUser])
 
     const handleFormSubmission = async (e) => {
         e.preventDefault();

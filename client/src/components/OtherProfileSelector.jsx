@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import toast from 'react-hot-toast';
-import { useEffect } from 'react';
+import { OtherProfileContext } from '../context/OtherProfile';
 
 const OtherProfileSelector = () => {
     const [userData, setUserData] = useState([]);
@@ -10,11 +10,7 @@ const OtherProfileSelector = () => {
     const [isAddClick, setIsAddClick] = useState(false);
     const [newName, setNewName] = useState("");
     const [addLoader, setAddLoader] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(JSON.parse(sessionStorage.getItem("otherSelectedUser")) || []);
-
-    useEffect(() => {
-        sessionStorage.setItem("otherSelectedUser", JSON.stringify(selectedUser));
-    }, [selectedUser])
+    const { selectedUser, setSelectedUser } = useContext(OtherProfileContext);
 
     const handleProfileClick = async (e) => {
         e.preventDefault();

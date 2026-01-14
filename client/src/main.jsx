@@ -5,10 +5,20 @@ import App from "./App.jsx"
 
 import { BrowserRouter } from 'react-router-dom';
 
+import { ProfileProvider } from "./context/Profile.jsx";
+import { EditProfileProvider } from "./context/EditProfile.jsx";
+import { OtherProfileProvider } from "./context/OtherProfile.jsx";
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <ProfileProvider>
+        <EditProfileProvider>
+          <OtherProfileProvider>
+            <App />
+          </OtherProfileProvider>
+        </EditProfileProvider>
+      </ProfileProvider>
     </BrowserRouter>
   </StrictMode>,
 )

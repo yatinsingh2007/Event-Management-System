@@ -192,6 +192,9 @@ app.get('/' , (req , res) => {
 async function main() {
   await prisma.$connect();
   console.log("Connected to Database successfully!");
+  app.listen(process.env.PORT , () => {
+    console.log('Server is Listening')
+  })
 }
 
 main()

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import toast from 'react-hot-toast';
-import { useEffect } from 'react';
+import { EditProfileContext } from '../context/EditProfile';
 
 const EditProfileSelector = () => {
     const [userData, setUserData] = useState([]);
@@ -10,17 +10,7 @@ const EditProfileSelector = () => {
     const [isAddClick, setIsAddClick] = useState(false);
     const [newName, setNewName] = useState("");
     const [addLoader, setAddLoader] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(() => {
-        try {
-            return JSON.parse(sessionStorage.getItem("editSelectedUser")) || [];
-        } catch {
-            return []
-        }
-    });
-
-    useEffect(() => {
-        sessionStorage.setItem("editSelectedUser", JSON.stringify(selectedUser));
-    }, [selectedUser])
+    const { selectedUser, setSelectedUser } = useContext(EditProfileContext);
 
     const handleProfileClick = async (e) => {
         e.preventDefault();
