@@ -88,6 +88,10 @@ app.post("/api/createEvent", async (req, res) => {
 app.post("/api/getEvent", async (req, res) => {
   try {
     const { users } = req.body;
+    if (users.length === 0)
+      return res.status(400).json({
+        error: "At least one user is required",
+      });
     const events = await prisma.event.findMany({
       where: {
         users: {
