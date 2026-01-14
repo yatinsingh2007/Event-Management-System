@@ -12,7 +12,10 @@ const EventList = () => {
     const [activeLogId, setActiveLogId] = useState(null);
 
     useEffect(() => {
-        if (!selectedUser || selectedUser.length === 0) return;
+        if (!selectedUser || selectedUser.length === 0){
+            setEvents([])
+            return
+        }
         const getEvents = async () => {
             try {
                 setLoader(true)
