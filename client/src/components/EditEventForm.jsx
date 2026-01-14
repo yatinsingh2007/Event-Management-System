@@ -14,7 +14,8 @@ const EditEventForm = ({ eventId }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (eventId) {
+        if (!eventId) return;
+        else {
             const fetchEvent = async () => {
                 try {
                     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent/${eventId}`);
@@ -39,7 +40,7 @@ const EditEventForm = ({ eventId }) => {
             };
             fetchEvent();
         }
-    }, [eventId, setSelectEditedUser]);
+    }, [eventId]);
 
     const handleFormSubmission = async (e) => {
         e.preventDefault();
