@@ -40,6 +40,23 @@ const EventList = () => {
         getEvents();
     }, [selectedUser]);
 
+    const handleSearch = async (e) => {
+        try{
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ "users": selectedUser }),
+            });
+            const data = await response.json();
+            console.log(data)
+            setEvents(data);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col h-full">
             <h2 className="text-xl font-semibold mb-4">Events</h2>
@@ -135,8 +152,8 @@ const EventList = () => {
                                 <div className="bg-gray-50 p-3 text-xs border-t border-gray-200 animate-in slide-in-from-top-1 duration-200">
                                     <p className="font-medium text-gray-500 mb-1">Recent Updates</p>
                                     <div className="flex justify-between items-center text-gray-700">
-                                        <span>Last modified</span>
-                                        <span className="font-mono">{new Date(event.updatedAt || Date.now()).toLocaleString()}</span>
+                                        <span>Last modified</span>()
+                                        <span className="font-mono">{new Date(event.updatedAt).toLocaleString()}</span>
                                     </div>
                                 </div>
                             )}
@@ -148,6 +165,9 @@ const EventList = () => {
                     </div>
                 )}
             </div>
+            <button onClick={handleSearch} className='bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors'>
+                Search Events
+            </button>
         </div>
     );
 };
