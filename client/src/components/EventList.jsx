@@ -4,12 +4,32 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { ProfileContext } from '../context/ProfileProvider';
 import { EventContext } from '../context/EventProvider';
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const TIMEZONES = {
+    ET: "America/New_York",
+    CT: "America/Chicago",
+    MT: "America/Denver",
+    PT: "America/Los_Angeles",
+    HT: "Pacific/Honolulu",
+    GMT: "UTC",
+    IT: "Asia/Kolkata",
+    JT: "Asia/Tokyo",
+    KT: "Asia/Seoul",
+    NT: "America/St_Johns",
+};
 
 const EventList = () => {
     const navigate = useNavigate();
     const { selectedUser } = useContext(ProfileContext);
     const { events, setEvents } = useContext(EventContext);
     const [activeLogId, setActiveLogId] = useState(null);
+    const [tz, setTz] = useState(TIMEZONES.ET);
 
     useEffect(() => {
         if (!selectedUser || selectedUser.length === 0) {
@@ -42,10 +62,20 @@ const EventList = () => {
 
             <div className="mb-6">
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">View in Timezone</label>
-                <select className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Eastern Time (ET)</option>
-                    <option>Pacific Time (PT)</option>
-                    <option>Coordinated Universal Time (UTC)</option>
+                <select className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => {
+                    setTz(TIMEZONES[e.target.value])
+                }}>
+                    <option value="ET">Eastern Time (ET)</option>
+                    <option value="CT">Central Time (CT)</option>
+                    <option value="MT">Mountain Time (MT)</option>
+                    <option value="PT">Pacific Time (PT)</option>
+                    <option value="HT">Hawaii Time (HT)</option>
+                    <option value="GMT">GMT / UTC</option>
+                    <option value="IT">Indian Time (IST)</option>
+                    <option value="JT">Japan Time</option>
+                    <option value="KT">Korea Time</option>
+                    <option value="NT">Newfoundland Time</option>
                 </select>
             </div>
 
@@ -66,11 +96,11 @@ const EventList = () => {
                                         <div>
                                             <div className="text-xs font-medium text-gray-700">Start</div>
                                             <div className="text-sm text-gray-900">
-                                                {new Date(event.start).toLocaleDateString()}
+                                                {dayjs(event.start).tz(tz).format('YYYY-MM-DD')}
                                             </div>
                                             <div className="text-xs text-gray-500 flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
-                                                {new Date(event.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {dayjs(event.end).tz(tz).format('HH:mm')}
                                             </div>
                                         </div>
                                     </div>
@@ -80,11 +110,11 @@ const EventList = () => {
                                         <div>
                                             <div className="text-xs font-medium text-gray-700">End</div>
                                             <div className="text-sm text-gray-900">
-                                                {new Date(event.end).toLocaleDateString()}
+                                                {dayjs(event.end).tz(tz).format('YYYY-MM-DD')}
                                             </div>
                                             <div className="text-xs text-gray-500 flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
-                                                {new Date(event.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {dayjs(event.end).tz(tz).format('HH:mm')}
                                             </div>
                                         </div>
                                     </div>
@@ -94,7 +124,7 @@ const EventList = () => {
                             <div className="bg-gray-50 border-t border-gray-100 p-2 flex items-center justify-between gap-2">
                                 <div className="space-y-0.5">
                                     <div className="text-[10px] text-gray-400">
-                                        Created: {new Date(event.createdAt).toLocaleDateString()}
+                                        Created: {dayjs(event.createdAt).tz(tz).format('YYYY-MM-DD')}
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
@@ -132,7 +162,13 @@ const EventList = () => {
                                     <p className="font-medium text-gray-500 mb-1">Recent Updates</p>
                                     <div className="flex justify-between items-center text-gray-700">
                                         <span>Last modified</span>()
-                                        <span className="font-mono">{new Date(event.updatedAt).toLocaleString()}</span>
+                                        <div className="text-sm text-gray-900">
+                                            {dayjs(event.start).tz(tz).format('YYYY-MM-DD')}
+                                        </div>
+                                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            {dayjs(event.start).tz(tz).format('HH:mm')}
+                                        </div>
                                     </div>
                                 </div>
                             )}

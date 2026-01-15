@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, {useState, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import OtherProfileSelector from "./OtherProfileSelector";
 import { EventContext } from "../context/EventProvider";
@@ -23,14 +23,33 @@ const TIMEZONES = {
 };
 
 const CreateEventForm = () => {
-  const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("09:00");
-  const [endDate, setEndDate] = useState("");
-  const [endTime, setEndTime] = useState("09:00");
   const [selectedTZ, setSelectedTZ] = useState(TIMEZONES.ET);
+
+  const [startDate, setStartDate] = useState(() =>
+      dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
+  );
+
+  const [startTime, setStartTime] = useState(() =>
+      dayjs().tz(TIMEZONES.ET).format("HH:mm")
+  );
+
+  const [endDate, setEndDate] = useState(() =>
+      dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
+  );
+
+  const [endTime, setEndTime] = useState(() =>
+      dayjs().tz(TIMEZONES.ET).format("HH:mm")
+  );
   const [loading, setLoading] = useState(false);
 
   const { events, setEvents } = useContext(EventContext);
+  useEffect(() => {
+    setStartDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
+    setEndDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
+    setStartTime(dayjs().tz(selectedTZ).format("HH:mm"));
+    setEndTime(dayjs().tz(selectedTZ).format("HH:mm"));
+  }, [selectedTZ]);
+
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
@@ -132,7 +151,7 @@ const CreateEventForm = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              min={new Date().toISOString().split("T")[0]}
+              min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
               className="border rounded px-3 py-2"
             />
             <input
@@ -153,7 +172,7 @@ const CreateEventForm = () => {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              min={startDate || new Date().toISOString().split("T")[0]}
+              min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
               className="border rounded px-3 py-2"
             />
             <input
