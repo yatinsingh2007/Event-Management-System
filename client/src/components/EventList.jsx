@@ -9,7 +9,6 @@ const EventList = () => {
     const navigate = useNavigate();
     const { selectedUser } = useContext(ProfileContext);
     const { events, setEvents } = useContext(EventContext);
-    const [loader, setLoader] = useState(false)
     const [activeLogId, setActiveLogId] = useState(null);
 
     useEffect(() => {
@@ -19,7 +18,6 @@ const EventList = () => {
         }
         const getEvents = async () => {
             try {
-                setLoader(true)
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent`, {
                     method: 'POST',
                     headers: {
@@ -32,31 +30,11 @@ const EventList = () => {
                 setEvents(data);
             } catch (err) {
                 console.log(err);
-            } finally {
-                setLoader(false)
             }
         };
         getEvents();
     }, [selectedUser]);
 
-    const handleSearch = async (e) => {
-        try {
-            console.log(selectedUser)
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ "users": selectedUser }),
-            });
-            const data = await response.json();
-            console.log(data)
-            setEvents(data);
-        } catch (err) {
-            console.log(err);
-            toast.error("Something went wrong")
-        }
-    }
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col max-h-[500px]">
