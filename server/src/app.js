@@ -49,9 +49,13 @@ app.post("/api/createEvent", async (req, res) => {
 
     const usersData = await prisma.user.findMany({
       where: {
-        name: { in: users },
+        name: { 
+          in: users 
+        },
       },
-      select: { id: true },
+      select: { 
+        id: true 
+      },
     });
 
     const event = await prisma.event.create({
