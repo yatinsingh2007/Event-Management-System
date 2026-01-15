@@ -1,110 +1,180 @@
-import React, { useState , useContext } from 'react';
-import toast from 'react-hot-toast';
-import OtherProfileSelector from './OtherProfileSelector';
-import { EventContext } from '../context/EventProvider';
+import React, { useState, useContext } from "react";
+import toast from "react-hot-toast";
+import OtherProfileSelector from "./OtherProfileSelector";
+import { EventContext } from "../context/EventProvider";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const TIMEZONES = {
+  ET: "America/New_York",
+  CT: "America/Chicago",
+  MT: "America/Denver",
+  PT: "America/Los_Angeles",
+  HT: "Pacific/Honolulu",
+  GMT: "UTC",
+  IT: "Asia/Kolkata",
+  JT: "Asia/Tokyo",
+  KT: "Asia/Seoul",
+  NT: "America/St_Johns",
+};
+
 const CreateEventForm = () => {
-    const [startDate, setStartDate] = useState("");
-    const [startTime, setStartTime] = useState("09:00");
-    const [endDate, setEndDate] = useState("");
-    const [endTime, setEndTime] = useState("09:00");
-    const [loading, setLoading] = useState(false);
-    const {  events , setEvents } = useContext(EventContext);
-    const handleFormSubmission = async (e) => {
-        e.preventDefault();
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("09:00");
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("09:00");
+  const [selectedTZ, setSelectedTZ] = useState(TIMEZONES.ET);
+  const [loading, setLoading] = useState(false);
 
-        const storedUsers = localStorage.getItem('otherProfileSelectedUser');
-        const selectedUser = storedUsers ? JSON.parse(storedUsers) : [];
+  const { events, setEvents } = useContext(EventContext);
 
-        if (!selectedUser || selectedUser.length === 0) {
-            toast.error("Please select at least one profile");
-            return;
-        }
-        if (!startDate || !startTime || !endDate || !endTime) {
-            toast.error("Please fill in all date and time fields");
-            return;
-        }
+  const handleFormSubmission = async (e) => {
+    e.preventDefault();
 
-        try {
-            setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/createEvent`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    "users": selectedUser,
-                    "startAt": startDate + "T" + startTime,
-                    "endAt": endDate + "T" + endTime
-                })
-            })
-            const data = await response.json();
-            setEvents([...events, data]);
-            toast.success('Event created successfully!');
-        } catch (err) {
-            console.log(err)
-            toast.error('An error occurred');
-        } finally {
-            setLoading(false);
-        }
+    const storedUsers = localStorage.getItem("otherProfileSelectedUser");
+    const selectedUser = storedUsers ? JSON.parse(storedUsers) : [];
+
+    if (!selectedUser.length) {
+      toast.error("Please select at least one profile");
+      return;
     }
-    return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold mb-6">Create Event</h2>
 
-            <form className="space-y-5" onSubmit={handleFormSubmission}>
-                <div className="space-y-4">
-                    <OtherProfileSelector />
-                </div>
+    if (!startDate || !startTime || !endDate || !endTime) {
+      toast.error("Please fill in all date and time fields");
+      return;
+    }
 
-                <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-700">Timezone</label>
-                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>Eastern Time (ET)</option>
-                        <option>Pacific Time (PT)</option>
-                        <option>Coordinated Universal Time (UTC)</option>
-                    </select>
-                </div>
+    const startUTC = dayjs
+      .tz(`${startDate}T${startTime}`, selectedTZ)
+      .utc()
+      .toISOString();
 
-                <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={startDate} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
-                                setStartDate(e.target.value);
-                            }} />
-                        </div>
-                        <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={startTime} onChange={(e) => {
-                                setStartTime(e.target.value);
-                            }} />
-                        </div>
-                    </div>
-                </div>
+    const endUTC = dayjs
+      .tz(`${endDate}T${endTime}`, selectedTZ)
+      .utc()
+      .toISOString();
 
-                <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endDate} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
-                                setEndDate(e.target.value);
-                            }} />
-                        </div>
-                        <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endTime} onChange={(e) => {
-                                setEndTime(e.target.value);
-                            }} />
-                        </div>
-                    </div>
-                </div>
+    if (dayjs(endUTC).isBefore(startUTC)) {
+      toast.error("End time must be after start time");
+      return;
+    }
 
-                <div className="pt-2">
-                    <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer transition-colors disabled:opacity-50">
-                        {loading ? '+ Create Event' : '+ Create Event'}
-                    </button>
-                </div>
-            </form>
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/createEvent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            users: selectedUser,
+            startAt: startUTC,
+            endAt: endUTC,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      setEvents([...events, data]);
+      toast.success("Event created successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTimezoneChange = (e) => {
+    setSelectedTZ(TIMEZONES[e.target.value]);
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h2 className="text-xl font-semibold mb-6">Create Event</h2>
+
+      <form className="space-y-5" onSubmit={handleFormSubmission}>
+        <OtherProfileSelector />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Timezone
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-md px-3 py-2"
+            onChange={handleTimezoneChange}
+            defaultValue="ET"
+          >
+            <option value="ET">Eastern Time (ET)</option>
+            <option value="CT">Central Time (CT)</option>
+            <option value="MT">Mountain Time (MT)</option>
+            <option value="PT">Pacific Time (PT)</option>
+            <option value="HT">Hawaii Time (HT)</option>
+            <option value="GMT">GMT / UTC</option>
+            <option value="IT">Indian Time (IST)</option>
+            <option value="JT">Japan Time</option>
+            <option value="KT">Korea Time</option>
+            <option value="NT">Newfoundland Time</option>
+          </select>
         </div>
-    );
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Start Date & Time
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className="border rounded px-3 py-2"
+            />
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="border rounded px-3 py-2"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            End Date & Time
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate || new Date().toISOString().split("T")[0]}
+              className="border rounded px-3 py-2"
+            />
+            <input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="border rounded px-3 py-2"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
+        >
+          + Create Event
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default CreateEventForm;
