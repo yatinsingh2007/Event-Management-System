@@ -24,6 +24,18 @@ app.get("/api/getAllUsers", async (req, res) => {
   }
 });
 
+app.post('/api/createUser' , async (req , res) => {
+  try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: "Name is required" });
+    const user = await prisma.user.create({ data: { name } });
+    return res.status(201).json(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
 app.post("/api/createEvent", async (req, res) => {
   try {
     const { users, startAt, endAt } = req.body;

@@ -90,7 +90,7 @@ const ProfileSelector = () => {
                     </div>
                     <div className="p-2 border-t border-gray-100">
                         {isAddClick && <input type='text' placeholder='Enter profile name' className='w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-sm mb-2' onChange={(e) => setNewName(e.target.value)} />}
-                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md w-full text-sm font-medium transition-colors" onClick={async (e) => {
+                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md w-full text-sm font-medium transition-colors flex justify-between items-center" onClick={async (e) => {
                             e.preventDefault();
                             if (isAddClick && newName.length == 0) {
                                 setIsAddClick(false);
