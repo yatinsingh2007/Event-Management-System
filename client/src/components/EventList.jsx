@@ -59,7 +59,7 @@ const EventList = () => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col h-full">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col max-h-[500px]">
             <h2 className="text-xl font-semibold mb-4">Events</h2>
 
             <div className="mb-6">
