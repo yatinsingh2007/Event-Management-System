@@ -24,44 +24,34 @@ app.get("/api/getAllUsers", async (req, res) => {
   }
 });
 
-app.post("/api/createUser", async (req, res) => {
-  try {
-    const { name } = req.body;
-    if (!name)
-      return res.status(400).json({
-        error: "Name is required",
-      });
-    const user = await prisma.user.create({
-      data: {
-        name,
-      },
-    });
-    return res.status(201).json(user);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
-  }
-});
-
 app.post("/api/createEvent", async (req, res) => {
   try {
     const { users, startAt, endAt } = req.body;
-    if (users.length === 0)
-      return res.status(400).json({
-        error: "At least one user is required",
-      });
+
+    if (!users || users.length === 0) {
+      return res.status(400).json({ error: "At least one user is required" });
+    }
+
+    if (!startAt || !endAt) {
+      return res.status(400).json({ error: "startAt and endAt are required" });
+    }
+
+    const startDate = new Date(startAt);
+    const endDate = new Date(endAt);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    if (endDate <= startDate) {
+      return res.status(400).json({ error: "End time must be after start time" });
+    }
 
     const usersData = await prisma.user.findMany({
       where: {
-        name: {
-          in: users,
-        },
+        name: { in: users },
       },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
 
     const event = await prisma.event.create({
@@ -69,19 +59,18 @@ app.post("/api/createEvent", async (req, res) => {
         users: {
           connect: usersData,
         },
-        start: new Date(startAt + ":00"),
-        end: new Date(endAt + ":00"),
+        start: startDate, 
+        end: endDate, 
       },
       include: {
         users: true,
       },
     });
+
     return res.status(201).json(event);
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
