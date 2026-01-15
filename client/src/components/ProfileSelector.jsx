@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import toast from 'react-hot-toast';
-import { ProfileContext } from '../context/Profile';
+import { ProfileContext } from '../context/ProfileProvider';
 
 const ProfileSelector = () => {
     const [userData, setUserData] = useState([]);

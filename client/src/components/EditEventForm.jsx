@@ -1,17 +1,16 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import EditProfileSelector from './EditProfileSelector';
-import { EditProfileContext } from '../context/EditProfile';
 
 const EditEventForm = ({ eventId }) => {
     const navigate = useNavigate();
-    const { selectEditedUser, setSelectEditedUser } = useContext(EditProfileContext);
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("09:00");
     const [endDate, setEndDate] = useState("");
     const [endTime, setEndTime] = useState("09:00");
     const [loading, setLoading] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
         if (!eventId) return;
@@ -25,11 +24,13 @@ const EditEventForm = ({ eventId }) => {
                         const end = new Date(data.end);
 
                         setStartDate(start.toISOString().split('T')[0]);
-                        setStartTime(start.toTimeString().slice(0, 5));
                         setEndDate(end.toISOString().split('T')[0]);
+                        setStartTime(start.toTimeString().slice(0, 5));
                         setEndTime(end.toTimeString().slice(0, 5));
+
                         const userNames = data.users.map(u => u.name);
-                        setEditSelectedUser(userNames);
+                        localStorage.setItem('editProfileSelectedUser', JSON.stringify(userNames));
+                        setDataLoaded(true);
                     } else {
                         toast.error("Failed to fetch event details");
                     }
@@ -44,7 +45,9 @@ const EditEventForm = ({ eventId }) => {
 
     const handleFormSubmission = async (e) => {
         e.preventDefault();
-        const currentSelectedUsers = editSelectedUser || [];
+
+        const storedUsers = localStorage.getItem('editProfileSelectedUser');
+        const currentSelectedUsers = storedUsers ? JSON.parse(storedUsers) : [];
 
         if (currentSelectedUsers.length === 0) {
             toast.error("Please select at least one profile");
@@ -88,7 +91,7 @@ const EditEventForm = ({ eventId }) => {
 
             <form className="space-y-5" onSubmit={handleFormSubmission}>
                 <div className="space-y-4">
-                    <EditProfileSelector key={JSON.stringify(editSelectedUser)} />
+                    {dataLoaded && <EditProfileSelector />}
                 </div>
 
                 <div className="space-y-1">

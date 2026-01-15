@@ -2,17 +2,18 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Users, Calendar, Clock, Edit2, FileText, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { ProfileContext } from '../context/Profile';
+import { ProfileContext } from '../context/ProfileProvider';
+import { EventContext } from '../context/EventProvider';
 
 const EventList = () => {
     const navigate = useNavigate();
     const { selectedUser } = useContext(ProfileContext);
-    const [events, setEvents] = useState([]);
+    const { events, setEvents } = useContext(EventContext);
     const [loader, setLoader] = useState(false)
     const [activeLogId, setActiveLogId] = useState(null);
 
     useEffect(() => {
-        if (!selectedUser || selectedUser.length === 0){
+        if (!selectedUser || selectedUser.length === 0) {
             setEvents([])
             return
         }

@@ -1,18 +1,20 @@
-import React, { useState, useContext } from 'react';
+import React, { useState , useContext } from 'react';
 import toast from 'react-hot-toast';
 import OtherProfileSelector from './OtherProfileSelector';
-import { OtherProfileContext } from '../context/OtherProfile';
-
+import { EventContext } from '../context/EventProvider';
 const CreateEventForm = () => {
-    const { selectedUser } = useContext(OtherProfileContext);
     const [startDate, setStartDate] = useState("");
     const [startTime, setStartTime] = useState("09:00");
     const [endDate, setEndDate] = useState("");
     const [endTime, setEndTime] = useState("09:00");
     const [loading, setLoading] = useState(false);
-
+    const {  events , setEvents } = useContext(EventContext);
     const handleFormSubmission = async (e) => {
         e.preventDefault();
+
+        const storedUsers = localStorage.getItem('otherProfileSelectedUser');
+        const selectedUser = storedUsers ? JSON.parse(storedUsers) : [];
+
         if (!selectedUser || selectedUser.length === 0) {
             toast.error("Please select at least one profile");
             return;
@@ -36,11 +38,8 @@ const CreateEventForm = () => {
                 })
             })
             const data = await response.json();
-            if (response.ok) {
-                toast.success('Event created successfully!');
-            } else {
-                toast.error(data.error || 'Failed to create event');
-            }
+            setEvents([...events, data]);
+            toast.success('Event created successfully!');
         } catch (err) {
             console.log(err)
             toast.error('An error occurred');
