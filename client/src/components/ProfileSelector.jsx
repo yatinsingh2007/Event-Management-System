@@ -112,6 +112,7 @@ const ProfileSelector = () => {
                                     setFilteredData([...userData, data]);
                                     toast.success('Profile added successfully');
                                     setNewName("");
+                                    e.target.value = "";
                                 } else {
                                     toast.error(data.error || "Failed to add profile");
                                 }
