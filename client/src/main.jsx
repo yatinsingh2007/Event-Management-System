@@ -6,12 +6,15 @@ import App from "./App.jsx"
 import { BrowserRouter } from 'react-router-dom';
 
 import { ProfileProvider } from "./context/ProfileProvider.jsx";
+import { EventProvider } from "./context/EventProvider.jsx";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ProfileProvider>
-      <App />
-    </ProfileProvider>
+    <EventProvider>
+      <ProfileProvider>
+        <App />
+      </ProfileProvider>
+    </EventProvider>
   </StrictMode>,
 )
 
