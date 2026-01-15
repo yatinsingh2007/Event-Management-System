@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import EditProfileSelector from './EditProfileSelector';
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const EditEventForm = ({ eventId }) => {
     const navigate = useNavigate();
@@ -86,7 +92,7 @@ const EditEventForm = ({ eventId }) => {
         }
     }
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-h-96 overflow-y-auto">
             <h2 className="text-xl font-semibold mb-6">Edit Event</h2>
 
             <form className="space-y-5" onSubmit={handleFormSubmission}>
