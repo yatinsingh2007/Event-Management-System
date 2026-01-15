@@ -143,7 +143,7 @@ app.put("/api/updateEvent/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { users, startAt, endAt } = req.body;
-    console.log(users);
+
     const usersData = await prisma.user.findMany({
       where: {
         name: {
@@ -154,18 +154,19 @@ app.put("/api/updateEvent/:id", async (req, res) => {
         id: true,
       },
     });
-    console.log(usersData);
+
     const event = await prisma.event.update({
       where: { id },
       data: {
         users: {
           set: usersData,
         },
-        start: new Date(startAt + ":00"),
-        end: new Date(endAt + ":00"),
+        start: new Date(startAt),
+        end: new Date(endAt),
       },
       include: { users: true },
     });
+
     return res.status(200).json(event);
   } catch (err) {
     console.log(err);
