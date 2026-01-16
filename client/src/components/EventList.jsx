@@ -161,7 +161,7 @@ const EventList = () => {
                                 <div className="bg-gray-50 p-3 text-xs border-t border-gray-200 animate-in slide-in-from-top-1 duration-200">
                                     <p className="font-medium text-gray-500 mb-1">Recent Updates</p>
                                     <div className="flex justify-between items-center text-gray-700">
-                                        <span>Last modified</span>()
+                                        <span>Last modified</span>
                                         <div className="text-sm text-gray-900">
                                             {dayjs(event.start).tz(tz).format('YYYY-MM-DD')}
                                         </div>

@@ -143,20 +143,20 @@ const EditEventForm = ({ eventId }) => {
                     <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={start} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
                                 const newDate = e.target.value;
                                 const present = dayjs().tz(tz);
                                 const newDateUTC = dayjs.tz(`${newDate}T${present.format("HH:mm")}`, tz).utc();
                                 setStartUTC(newDateUTC);
-                            }} />
+                            }} value={startUTC.tz(tz).format("YYYY-MM-DD")}/>
                         </div>
                         <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={startTime} onChange={(e) => {
+                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" onChange={(e) => {
                                 const newTime = e.target.value;
                                 const present = dayjs().tz(tz);
                                 const newDateUTC = dayjs.tz(`${present.format("YYYY-MM-DD")}T${newTime}`, tz).utc();
                                 setStartUTC(newDateUTC);
-                            }} />
+                            }} value={startUTC.tz(tz).format("HH:mm")}/>
                         </div>
                     </div>
                 </div>
@@ -165,20 +165,20 @@ const EditEventForm = ({ eventId }) => {
                     <label className="block text-sm font-medium text-gray-700">End Date & Time</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endDate} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"  placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
                                 const newDate = e.target.value;
                                 const present = dayjs().tz(tz);
                                 const newDateUTC = dayjs.tz(`${newDate}T${present.format("HH:mm")}`, tz).utc();
                                 setEndUTC(newDateUTC);
-                            }} />
+                            }} value={endUTC.tz(tz).format("YYYY-MM-DD")}/>
                         </div>
                         <div className="relative">
-                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endTime} onChange={(e) => {
+                            <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"  onChange={(e) => {
                                 const newTime = e.target.value;
                                 const present = dayjs().tz(tz);
                                 const newDateUTC = dayjs.tz(`${present.format("YYYY-MM-DD")}T${newTime}`, tz).utc();
                                 setEndUTC(newDateUTC);
-                            }} />
+                            }} value={endUTC.tz(tz).format("HH:mm")}/>
                         </div>
                     </div>
                 </div>
