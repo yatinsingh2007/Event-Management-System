@@ -144,6 +144,17 @@ app.put("/api/updateEvent/:id", async (req, res) => {
     const { id } = req.params;
     const { users, startAt, endAt } = req.body;
 
+    const start = new Date(startAt);
+    const end = new Date(endAt);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    if (end <= start) {
+      return res.status(400).json({ error: "End time must be after start time" });
+    }
+
     const usersData = await prisma.user.findMany({
       where: {
         name: {
@@ -161,8 +172,8 @@ app.put("/api/updateEvent/:id", async (req, res) => {
         users: {
           set: usersData,
         },
-        start: new Date(startAt),
-        end: new Date(endAt),
+        start: start,
+        end: end,
       },
       include: { users: true },
     });
@@ -171,7 +182,7 @@ app.put("/api/updateEvent/:id", async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
-  }
+  } 
 });
 
 app.delete("/api/deleteEvent/:id", async (req, res) => {
