@@ -26,19 +26,19 @@ const CreateEventForm = () => {
   const [selectedTZ, setSelectedTZ] = useState(TIMEZONES.ET);
 
   const [startDate, setStartDate] = useState(() =>
-      dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
+    dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
   );
 
   const [startTime, setStartTime] = useState(() =>
-      dayjs().tz(TIMEZONES.ET).format("HH:mm")
+    dayjs().tz(TIMEZONES.ET).format("HH:mm")
   );
 
   const [endDate, setEndDate] = useState(() =>
-      dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
+    dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
   );
 
   const [endTime, setEndTime] = useState(() =>
-      dayjs().tz(TIMEZONES.ET).format("HH:mm")
+    dayjs().tz(TIMEZONES.ET).format("HH:mm")
   );
   const [loading, setLoading] = useState(false);
 
@@ -100,8 +100,13 @@ const CreateEventForm = () => {
       );
 
       const data = await response.json();
-      setEvents([...events, data]);
-      toast.success("Event created successfully!");
+
+      if (response.ok) {
+        setEvents([...events, data]);
+        toast.success("Event created successfully!");
+      } else {
+        toast.error(data.error || "Failed to create event");
+      }
     } catch (err) {
       console.error(err);
       toast.error("An error occurred");

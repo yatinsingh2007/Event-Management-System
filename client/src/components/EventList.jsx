@@ -63,9 +63,9 @@ const EventList = () => {
             <div className="mb-6">
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">View in Timezone</label>
                 <select className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={(e) => {
-                    setTz(TIMEZONES[e.target.value])
-                }}>
+                    onChange={(e) => {
+                        setTz(TIMEZONES[e.target.value])
+                    }}>
                     <option value="ET">Eastern Time (ET)</option>
                     <option value="CT">Central Time (CT)</option>
                     <option value="MT">Mountain Time (MT)</option>
@@ -87,7 +87,7 @@ const EventList = () => {
                                 <div className="flex items-center gap-2">
                                     <Users className="w-4 h-4 text-indigo-500" />
                                     <span className="text-sm font-medium text-gray-900 line-clamp-1">
-                                        {event.users.map(u => u.name).join(', ')}
+                                        {event.users?.map(u => u.name).join(', ')}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
