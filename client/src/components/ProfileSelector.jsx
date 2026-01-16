@@ -51,7 +51,7 @@ const ProfileSelector = () => {
     return (
         <div className="relative">
             <div
-                className="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer min-w-[200px]"
+                className="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer sm:min-w-[200px] max-w-[500px]"
                 onClick={handleProfileClick}
             >
                 {selectedUser.length === 0 ? "Select profile's" : selectedUser.join(", ")}

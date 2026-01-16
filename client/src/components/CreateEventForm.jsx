@@ -126,12 +126,12 @@ const CreateEventForm = () => {
       <form className="space-y-5" onSubmit={handleFormSubmission}>
         <OtherProfileSelector />
 
-        <div>
+        <div className="max-w-96">
           <label className="block text-sm font-medium text-gray-700">
             Timezone
           </label>
           <select
-            className="w-full border border-gray-300 rounded-md px-3 py-2"
+            className="w-full border border-gray-300 rounded-md sm:px-3 sm:py-2 py-2.5 px-0.5"
             onChange={handleTimezoneChange}
             defaultValue="ET"
           >
@@ -152,19 +152,19 @@ const CreateEventForm = () => {
           <label className="block text-sm font-medium text-gray-700">
             Start Date & Time
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex gap-3 sm:flex-nowrap flex-wrap">
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
-              className="border rounded px-3 py-2"
+              className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
             <input
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="border rounded px-3 py-2"
+              className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
           </div>
         </div>
@@ -173,19 +173,19 @@ const CreateEventForm = () => {
           <label className="block text-sm font-medium text-gray-700">
             End Date & Time
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex gap-3 sm:flex-nowrap flex-wrap">
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
-              className="border rounded px-3 py-2"
+              className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="border rounded px-3 py-2"
+              className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
           </div>
         </div>

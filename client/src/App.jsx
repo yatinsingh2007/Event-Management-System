@@ -7,7 +7,7 @@ import EditEventPage from './components/EditEventPage';
 function App() {
     return (
     <BrowserRouter>
-        <div className="min-h-screen bg-gray-50 p-8 font-sans text-gray-800">
+        <div className="min-h-screen bg-gray-50 p-8 font-sans text-gray-800 min-w-screen">
             <Toaster position="top-right" />
             <Routes>
                 <Route path="/" element={<Dashboard />} />
