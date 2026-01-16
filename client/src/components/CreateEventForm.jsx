@@ -25,31 +25,17 @@ const TIMEZONES = {
 const CreateEventForm = () => {
   const [selectedTZ, setSelectedTZ] = useState(TIMEZONES.ET);
 
-  const [startDate, setStartDate] = useState(() =>
-    dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
+
+  const [startUTC, setStartUTC] = useState(
+    dayjs().tz(TIMEZONES.ET).utc()
+  );
+  const [endUTC, setEndUTC] = useState(
+    dayjs().tz(TIMEZONES.ET).add(1, "hour").utc()
   );
 
-  const [startTime, setStartTime] = useState(() =>
-    dayjs().tz(TIMEZONES.ET).format("HH:mm")
-  );
-
-  const [endDate, setEndDate] = useState(() =>
-    dayjs().tz(TIMEZONES.ET).format("YYYY-MM-DD")
-  );
-
-  const [endTime, setEndTime] = useState(() =>
-    dayjs().tz(TIMEZONES.ET).format("HH:mm")
-  );
   const [loading, setLoading] = useState(false);
 
   const { events, setEvents } = useContext(EventContext);
-
-  useEffect(() => {
-    setStartDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
-    setEndDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
-    setStartTime(dayjs().tz(selectedTZ).format("HH:mm"));
-    setEndTime(dayjs().tz(selectedTZ).format("HH:mm"));
-  }, [selectedTZ]);
 
 
   const handleFormSubmission = async (e) => {
@@ -63,22 +49,10 @@ const CreateEventForm = () => {
       return;
     }
 
-    if (!startDate || !startTime || !endDate || !endTime) {
-      toast.error("Please fill in all date and time fields");
-      return;
-    }
+    const startAt = startUTC.toISOString();
+    const endAt = endUTC.toISOString();
 
-    const startUTC = dayjs
-      .tz(`${startDate}T${startTime}`, selectedTZ)
-      .utc()
-      .toISOString();
-
-    const endUTC = dayjs
-      .tz(`${endDate}T${endTime}`, selectedTZ)
-      .utc()
-      .toISOString();
-
-    if (dayjs(endUTC).isBefore(startUTC)) {
+    if (dayjs(endAt).isBefore(startAt)) {
       toast.error("End time must be after start time");
       return;
     }
@@ -92,9 +66,9 @@ const CreateEventForm = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            users: selectedUser,
-            startAt: startUTC,
-            endAt: endUTC,
+            "users": selectedUser,
+            "startAt": startAt,
+            "endAt": endAt,
           }),
         }
       );
@@ -155,16 +129,25 @@ const CreateEventForm = () => {
           <div className="flex gap-3 sm:flex-nowrap flex-wrap">
             <input
               type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
+              value={startUTC.tz(selectedTZ).format("YYYY-MM-DD")}
+              onChange={(e) => {
+                const newDate = e.target.value;
+                const current = startUTC.tz(selectedTZ);
+                const newUTC = dayjs.tz(`${newDate}T${current.format("HH:mm")}`, selectedTZ).utc();
+                setStartUTC(newUTC);
+              }}
               className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
             <input
               type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
+              value={startUTC.tz(selectedTZ).format("HH:mm")}
+              onChange={(e) => {
+                const newTime = e.target.value;
+                const current = startUTC.tz(selectedTZ);
+                const newUTC = dayjs.tz(`${current.format("YYYY-MM-DD")}T${newTime}`, selectedTZ).utc();
+                setStartUTC(newUTC);
+                }}
+                className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
           </div>
         </div>
@@ -176,15 +159,24 @@ const CreateEventForm = () => {
           <div className="flex gap-3 sm:flex-nowrap flex-wrap">
             <input
               type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={dayjs().tz(selectedTZ).format("YYYY-MM-DD")}
+              value={endUTC.tz(selectedTZ).format("YYYY-MM-DD")}
+              onChange={(e) => {
+                const newDate = e.target.value;
+                const current = endUTC.tz(selectedTZ);
+                const newUTC = dayjs.tz(`${newDate}T${current.format("HH:mm")}`, selectedTZ).utc();
+                setEndUTC(newUTC);
+              }}
               className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
             <input
               type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              value={endUTC.tz(selectedTZ).format("HH:mm")}
+              onChange={(e) => {
+                const newTime = e.target.value;
+                const current = endUTC.tz(selectedTZ);
+                const newUTC = dayjs.tz(`${current.format("YYYY-MM-DD")}T${newTime}`, selectedTZ).utc();
+                setEndUTC(newUTC);
+              }}
               className="border rounded sm:px-3 sm:py-2 py-1 w-full px-0.5"
             />
           </div>

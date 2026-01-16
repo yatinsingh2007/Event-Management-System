@@ -23,18 +23,8 @@ const TIMEZONES = {
 
 const EditEventForm = ({ eventId }) => {
     const navigate = useNavigate();
-    const [startDate, setStartDate] = useState(() => {
-        return dayjs().tz(TIMEZONES.ET).format('YYYY-MM-DD')
-    });
-    const [startTime, setStartTime] = useState(() => {
-        return dayjs().tz(TIMEZONES.ET).format('HH:mm')
-    });
-    const [endDate, setEndDate] = useState(() => {
-        return dayjs().tz(TIMEZONES.ET).format('YYYY-MM-DD')
-    });
-    const [endTime, setEndTime] = useState(() => {
-        return dayjs().tz(TIMEZONES.ET).format('HH:mm')
-    });
+    const [startUTC , setStartUTC] = useState(dayjs().tz(TIMEZONES.ET).utc())
+    const [endUTC , setEndUTC] = useState(dayjs().tz(TIMEZONES.ET).add(1 , "hour").utc())
     const [loading, setLoading] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [tz , setTz] = useState(TIMEZONES.ET)
@@ -85,12 +75,8 @@ const EditEventForm = ({ eventId }) => {
             toast.error("Please select at least one profile");
             return;
         }
-        if (!startDate || !startTime || !endDate || !endTime) {
-            toast.error("Please fill in all date and time fields");
-            return;
-        }
-        const startUTC = dayjs.tz(`${startDate}T${startTime}` , tz).utc();
-        const endUTC = dayjs.tz(`${endDate}T${endTime}` , tz).utc();
+        const startAt = startUTC.toISOString();
+        const endAt = endUTC.toISOString();
 
         try {
             setLoading(true);
@@ -101,8 +87,8 @@ const EditEventForm = ({ eventId }) => {
                 },
                 body: JSON.stringify({
                     "users": currentSelectedUsers,
-                    "startAt": startUTC.toISOString() ,
-                    "endAt": endUTC.toISOString(),
+                    "startAt": startAt ,
+                    "endAt": endAt,
                 })
             })
             const data = await response.json();
@@ -122,7 +108,7 @@ const EditEventForm = ({ eventId }) => {
 
     const handleTimezoneChange = (e) => {
         setTz(TIMEZONES[e.target.value]);
-    }
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-h-96 overflow-y-auto">
@@ -157,13 +143,19 @@ const EditEventForm = ({ eventId }) => {
                     <label className="block text-sm font-medium text-gray-700">Start Date & Time</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
-                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={startDate} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
-                                setStartDate(dayjs(e.target.value).tz(tz).format("YYYY-MM-DD"));
+                            <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={start} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                                const newDate = e.target.value;
+                                const present = dayjs().tz(tz);
+                                const newDateUTC = dayjs.tz(`${newDate}T${present.format("HH:mm")}`, tz).utc();
+                                setStartUTC(newDateUTC);
                             }} />
                         </div>
                         <div className="relative">
                             <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={startTime} onChange={(e) => {
-                                setStartTime(dayjs(e.target.value).tz(tz).format("HH:mm"));
+                                const newTime = e.target.value;
+                                const present = dayjs().tz(tz);
+                                const newDateUTC = dayjs.tz(`${present.format("YYYY-MM-DD")}T${newTime}`, tz).utc();
+                                setStartUTC(newDateUTC);
                             }} />
                         </div>
                     </div>
@@ -174,12 +166,18 @@ const EditEventForm = ({ eventId }) => {
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
                             <input type="date" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endDate} placeholder="Pick a date" min={new Date().toISOString().split("T")[0]} onChange={(e) => {
-                                setEndDate(dayjs(e.target.value).tz(tz).format("YYYY-MM-DD"));
+                                const newDate = e.target.value;
+                                const present = dayjs().tz(tz);
+                                const newDateUTC = dayjs.tz(`${newDate}T${present.format("HH:mm")}`, tz).utc();
+                                setEndUTC(newDateUTC);
                             }} />
                         </div>
                         <div className="relative">
                             <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500" value={endTime} onChange={(e) => {
-                                setEndTime(dayjs(e.target.value).tz(tz).format("HH:mm"));
+                                const newTime = e.target.value;
+                                const present = dayjs().tz(tz);
+                                const newDateUTC = dayjs.tz(`${present.format("YYYY-MM-DD")}T${newTime}`, tz).utc();
+                                setEndUTC(newDateUTC);
                             }} />
                         </div>
                     </div>
