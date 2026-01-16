@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone  from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const EditProfileSelector = () => {
     const [userData, setUserData] = useState([]);

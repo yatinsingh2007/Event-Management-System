@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import OtherProfileSelector from "./OtherProfileSelector";
 import { EventContext } from "../context/EventProvider";
@@ -43,6 +43,7 @@ const CreateEventForm = () => {
   const [loading, setLoading] = useState(false);
 
   const { events, setEvents } = useContext(EventContext);
+
   useEffect(() => {
     setStartDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
     setEndDate(dayjs().tz(selectedTZ).format("YYYY-MM-DD"));
