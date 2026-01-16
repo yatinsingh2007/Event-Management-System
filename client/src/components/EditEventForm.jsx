@@ -37,14 +37,10 @@ const EditEventForm = ({ eventId }) => {
                     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/getEvent/${eventId}`);
                     const data = await response.json();
                     if (response.ok) {
-                        const start = new Date(data.start);
-                        const end = new Date(data.end);
-
-                        setStartDate(start.toISOString().split('T')[0]);
-                        setEndDate(end.toISOString().split('T')[0]);
-                        setStartTime(start.toTimeString().slice(0, 5));
-                        setEndTime(end.toTimeString().slice(0, 5));
-
+                        const start = dayjs.utc(data.start);
+                        const end = dayjs.utc(data.end);
+                        setStartUTC(start);
+                        setEndUTC(end);
                         const userNames = data.users.map(u => u.name);
                         localStorage.setItem('editProfileSelectedUser', JSON.stringify(userNames));
                         setDataLoaded(true);
@@ -60,9 +56,6 @@ const EditEventForm = ({ eventId }) => {
         }
     }, [eventId]);
 
-    useEffect(() => {
-
-    }, [tz]);
 
 
     const handleFormSubmission = async (e) => {
@@ -170,7 +163,8 @@ const EditEventForm = ({ eventId }) => {
                                 const present = dayjs().tz(tz);
                                 const newDateUTC = dayjs.tz(`${newDate}T${present.format("HH:mm")}`, tz).utc();
                                 setEndUTC(newDateUTC);
-                            }} value={endUTC.tz(tz).format("YYYY-MM-DD")}/>
+                            }} value={endUTC.tz(tz).format("YYYY-MM-DD")}
+                            />
                         </div>
                         <div className="relative">
                             <input type="time" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"  onChange={(e) => {
