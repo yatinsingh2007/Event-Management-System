@@ -2,216 +2,40 @@ require("dotenv").config();
 const { prisma } = require("./dbConfig/dbConfig");
 const express = require("express");
 const cors = require("cors");
+
+
+const userRoutes = require("./routes/userRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const app = express();
 
+
 app.use(
   cors({
     origin: FRONTEND_URL,
-  })
+  }),
 );
 app.use(express.json());
-app.get("/api/getAllUsers", async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    return res.status(200).json(users);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
-  }
-});
 
-app.post('/api/createUser' , async (req , res) => {
-  try {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ error: "Name is required" });
-    const user = await prisma.user.create({ data: { name } });
-    return res.status(201).json(user);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-})
-
-app.post("/api/createEvent", async (req, res) => {
-  try {
-    const { users, startAt, endAt } = req.body;
-
-    if (!users || users.length === 0) {
-      return res.status(400).json({ error: "At least one user is required" });
-    }
-
-    if (!startAt || !endAt) {
-      return res.status(400).json({ error: "startAt and endAt are required" });
-    }
-
-    const startDate = new Date(startAt);
-    const endDate = new Date(endAt);
-
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      return res.status(400).json({ error: "Invalid date format" });
-    }
-
-    if (endDate <= startDate) {
-      return res.status(400).json({ error: "End time must be after start time" });
-    }
-
-    const usersData = await prisma.user.findMany({
-      where: {
-        name: { 
-          in: users 
-        },
-      },
-      select: { 
-        id: true 
-      },
-    });
-
-    const event = await prisma.event.create({
-      data: {
-        users: {
-          connect: usersData,
-        },
-        start: startDate, 
-        end: endDate, 
-      },
-      include: {
-        users: true,
-      },
-    });
-
-    return res.status(201).json(event);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.post("/api/getEvent", async (req, res) => {
-  try {
-    const { users } = req.body;
-    if (users.length === 0)
-      return res.status(400).json({
-        error: "At least one user is required",
-      });
-    const events = await prisma.event.findMany({
-      where: {
-        users: {
-          some: {
-            name: {
-              in: users,
-            },
-          },
-        },
-      },
-      include: {
-        users: true,
-      },
-    });
-    return res.status(200).json(events);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
-  }
-});
-
-app.get("/api/getEvent/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const event = await prisma.event.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        users: true,
-      },
-    });
-    if (!event) return res.status(404).json({ error: "Event not found" });
-    return res.status(200).json(event);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.put("/api/updateEvent/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { users, startAt, endAt } = req.body;
-
-    const start = new Date(startAt);
-    const end = new Date(endAt);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({ error: "Invalid date format" });
-    }
-
-    if (end <= start) {
-      return res.status(400).json({ error: "End time must be after start time" });
-    }
-
-    const usersData = await prisma.user.findMany({
-      where: {
-        name: {
-          in: users,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    const event = await prisma.event.update({
-      where: { id },
-      data: {
-        users: {
-          set: usersData,
-        },
-        start: start,
-        end: end,
-      },
-      include: { users: true },
-    });
-
-    return res.status(200).json(event);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  } 
-});
-
-app.delete("/api/deleteEvent/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const event = await prisma.event.delete({
-      where: { 
-        id 
-      },
-    });
-    return res.status(200).json(event);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.get('/' , (req , res) => {
+// Welcome route
+app.get("/", (req, res) => {
   return res.status(200).json({
-    message : "Welcome to Event Management System"
-  })
-})
+    message: "Welcome to Event Management System",
+  });
+});
+
+// Mount routes
+app.use("/api", userRoutes);
+app.use("/api", eventRoutes);
 
 async function main() {
   await prisma.$connect();
   console.log("Connected to Database successfully!");
-  app.listen(process.env.PORT , () => {
-    console.log('Server is Listening')
-  })
+  app.listen(process.env.PORT, () => {
+    console.log("Server is Listening");
+  });
 }
 
 main()
@@ -219,6 +43,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
 
 module.exports = app;
